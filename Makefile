@@ -1,6 +1,6 @@
 CC=clang
-CFLAGS= -O2 -march=native -I../include -w
-LFLAGS= -L../lib -lantlr3c -lgmp -lcrypto -lpcre2-8
+CFLAGS= -O2 -march=native -I $(INCLUDE_DIR) -w
+LFLAGS= -L $(LIB_DIR) -lantlr3c -lgmp -lcrypto -lpcre2-8
 
 #Uncomment this to proivde input certificates in PEM format
 #TARGETS=RFC5280Lexer.o RFC5280Parser.o RFC5280mainPem.o
