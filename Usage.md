@@ -52,19 +52,19 @@ installed on the system where the parser is compiled.
 Right now, there are different interfaces to X.509ParSec,
 depending on which main file You compile.
 
- 1. RFC5280MainArgv.c : The certificate to be parsed is provided
+ 1. RFC5280MainPem.c : The certificate to be parsed is provided
 as the first command line argument to the executable, in PEM format 
 with no newlines (see example pem certificates). For instance,
 assuming we want to parse the example certificate 
-"KeycertSignNoBC_no_nl.pem" and the executable name is x509parser,
+`KeycertSignNoBC_no_nl.pem` and the executable name is x509parser,
 the parser is invoked by:
 
 `./x509parser $(cat KeycertSignNoBC_no_nl.pem)`
 
- 1. RFC5280MainFile.c : The path of the file storing the certificate 
+ 1. RFC5280MainDer.c : The path of the file storing the certificate 
 in DER format is the first command line argument to the executable.
 For instance, assuming we want to parse the example certificate 
-"hugeGenNames.der" and the executable name is x509parser, the parser
+`hugeGenNames.der` and the executable name is x509parser, the parser
 is inovked by:
 
 `./x509parser hugeGenNames.der`
