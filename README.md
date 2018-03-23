@@ -33,6 +33,8 @@ can be used.
  * `RFC5280.g` : this is the ANTLR grammar file, altogether with semantic
     actions which build the digital certificate data structure containing 
     the results of parsing.
+ * `RFC5280.tokens` : file containing the list of tokens employed by the
+    predicated grammar
  * `RFC5280Lexer.c` : this is the automatically generated lexer, that is
     the lexical recognizer. It basically transform a stream of bytes in
     a sequence of tokens which is later parsed
@@ -48,9 +50,9 @@ can be used.
  * `RFC5280.h` : Header file where the syntactic error codes for the 
     parser are defined, as well as all the necessary data structures to
     store the information contained in the digital certificate
- * `Usage.txt` : textual file which explains how to use the parser or to
-    generate a new instance, altogether to what is required or needs to
-    be installed
+ * `Usage.md` : textual file which explains how to use the parser or to
+    generate a new instance from the predicated grammar, altogether to 
+    what is required or needs to be installed
  * `Makefile` : This Makefile shows how the parser generation and compilation
     can be automatized
 ##### -----END FILE LIST-----
