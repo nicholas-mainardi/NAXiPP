@@ -7,11 +7,11 @@ parser is able to recognize only digital certificates whose length is less
 than 4GB and with asymmetric encryption algorithms defined in the following 
 set of complementary RFC documents:
 
---> RFC5758 (DSA and ECDSA)
---> RFC4055 (RSA Additional Algorithms),
---> RFC4491 (GOST suite)
---> RFC5480 (Ellyptic Curve Crypto), 
---> RFC3279 (Basic RSA, DSA, DH)  
+ * RFC5758 (DSA and ECDSA)
+ * RFC4055 (RSA Additional Algorithms),
+ * RFC4491 (GOST suite)
+ * RFC5480 (Ellyptic Curve Crypto), 
+ * RFC3279 (Basic RSA, DSA, DH)  
 
 All the details about the design of the predicated grammar will be found in
 an under publication paper.
@@ -39,8 +39,11 @@ can be used.
  * `RFC5280Parser.c` : this is the automatically generated parser, which
     performs syntactic validation on the sequence of tokens generated 
     by the lexer
- * `RFC5280main.c` : An example main file using the lexer and parser to 
-    recognize an X.509 digital certificate and retireve the digital
+ * `RFC5280mainPem.c` : An example main file using the lexer and parser 
+    to recognize a PEM X.509 digital certificate and retrieve the digital
+    certificate data structure
+ * `RFC5280mainDer.c` : An example main file using the lexer and parser 
+    to recognize a DER X.509 digital certificate and retrieve the digital
     certificate data structure
  * `RFC5280.h` : Header file where the syntactic error codes for the 
     parser are defined, as well as all the necessary data structures to
