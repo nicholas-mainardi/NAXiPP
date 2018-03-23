@@ -60,13 +60,15 @@ assuming we want to parse the example certificate
 the parser is invoked by:
 
 `./x509parser $(cat KeycertSignNoBC_no_nl.pem)`
- 1. `RFC5280MainDer.c` : The path of the file storing the certificate 
+
+ 2. `RFC5280MainDer.c` : The path of the file storing the certificate 
 in DER format is the first command line argument to the executable.
 For instance, assuming we want to parse the example certificate 
 `hugeGenNames.der` and the executable name is x509parser, the parser
 is inovked by:
 
 `./x509parser hugeGenNames.der`
+
 In both cases, the outcome of parsing is the exit code. A zero value
 means that the certificate is valid, while a non-zero value is
 returned is a syntactical error is found. The meaning of the different
