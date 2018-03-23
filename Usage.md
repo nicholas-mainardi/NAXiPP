@@ -1,4 +1,4 @@
-This file shows how to generate, compile and run NAnoXiPP.
+This file shows how to generate, compile and run NAXiPP.
 
 # Generate Parser
 

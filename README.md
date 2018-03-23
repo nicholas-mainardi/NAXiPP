@@ -1,5 +1,5 @@
-# NAnoXiPP
-NAnoXiPP - Not ANOther X509 ImProper Parser - is an automatically generated 
+# NAXiPP
+NAXiPP - Not Another X509 imProper Parser - is an automatically generated 
 LL(*) parser for X.509 digital certificates. The parser is generated, 
 starting from a predicated grammar, by the ANTLR 3.5 parser generator tool. 
 The C backend of ANTLR 3.5 is employed. Because of design choices, the 
