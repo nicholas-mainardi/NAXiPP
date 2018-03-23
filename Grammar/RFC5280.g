@@ -12,7 +12,7 @@ options{
 #include<pcre2.h>
 #include<openssl/x509.h>
 #include<openssl/x509v3.h>
-#include "RFC5280.h"
+#include "../gen_parser_src/RFC5280.h"
 #define NID_pSpecified 935
 #define NID_dhpublicnumber 920
 }
