@@ -4,7 +4,7 @@ EXE_DER = x509parser_der
 INCLUDE_DIR = /usr/include #specify the directory where the include files can be found
 LIB_DIR = /usr/lib #specify the directory where the external libraries can be found
 CC=clang
-CFLAGS= -O2 -march=native -I $(INCLUDE_DIR) -w
+CFLAGS= -O2 -march=native -I $(INCLUDE_DIR) -w 
 LFLAGS= -L $(LIB_DIR) -lantlr3c -lgmp -lcrypto -lpcre2-8
 
 SRC_DIR = gen_parser_src

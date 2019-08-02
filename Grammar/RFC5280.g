@@ -248,8 +248,10 @@ void mismatchHandling (pANTLR3_BASE_RECOGNIZER recognizer, ANTLR3_UINT32 ttype, 
         	exit(EMPTY_EXTENSIONS_LIST_ERROR);
         if(strstr(rule_list->fname,"extension") && !search_token(extension_oids,17,tokenNames[lookahead(3,parser_ctx)]) && strstr(tokenNames[lookahead(3,parser_ctx)],"OID"))
         	exit(EXTENSION_WRONG_OID_ERROR);
-        if(rule_list->next && rule_list->next->next && !strcmp(rule_list->next->next->fname,"issuer") && !strcmp(tokenNames[token->type],"Null") && (strstr(cert->signature_algorithm->oid->ln,"Pss") || !strstr(cert->signature_algorithm->oid->ln,"RSA")) 
-        && !strstr(cert->signature_algorithm->oid->ln,"GOST"))
+        /*if(rule_list->next && rule_list->next->next && !strcmp(rule_list->next->next->fname,"issuer") && !strcmp(tokenNames[token->type],"Null") && (strstr(cert->signature_algorithm->oid->ln,"Pss") || !strstr(cert->signature_algorithm->oid->ln,"RSA")) 
+        && !strstr(cert->signature_algorithm->oid->ln,"GOST"))*/
+	if(rule_list->next && rule_list->next->next && !strcmp(rule_list->next->next->fname,"issuer") && !strcmp(tokenNames[token->type],"Null") && (strstr(OBJ_nid2ln(OBJ_obj2nid(cert->signature_algorithm->oid)),"Pss") || !strstr(OBJ_nid2ln(OBJ_obj2nid(cert->signature_algorithm->oid)),"RSA")) 
+        && !strstr(OBJ_nid2ln(OBJ_obj2nid(cert->signature_algorithm->oid)),"GOST"))
         	exit(UNEXPECTED_NULL_ALG_ID_PARAMS_ERROR);
         if(search_token(int_tokens,4,tokenNames[token->type]) && search_lookahead(-5,0,"OIDBC",tokenNames))
         	if(!search_lookahead(-2,0,"TrueTag",tokenNames))
@@ -996,7 +998,7 @@ int compare_dn_entries(X509_DNAME_ENTRY *issuer,X509_DNAME_ENTRY *subject)
 	int j;
 	for(j=0;j<16;j++)
 	{
-		if(issuer->string_name->oid->nid == nids[j])
+		if(OBJ_obj2nid(issuer->string_name->oid) == nids[j])
 			break;
 	}
 	if(j!=16)
@@ -1021,7 +1023,7 @@ int compare_dn_entries(X509_DNAME_ENTRY *issuer,X509_DNAME_ENTRY *subject)
 				{
 				ASN1_OBJECT *issuer_obj = (ASN1_OBJECT *) issuer_iter->el;
 				ASN1_OBJECT *subject_obj = (ASN1_OBJECT *)subject_iter->el;
-				if( issuer_obj->nid != subject_obj->nid)
+				if( OBJ_obj2nid(issuer_obj) != OBJ_obj2nid(subject_obj))
 					return 0;
 				}
 			}
@@ -1055,7 +1057,7 @@ int compare_dn(STACK_OF(X509_DNAME_ENTRY *issuer),STACK_OF(X509_DNAME_ENTRY) *su
 			if(j == i)
 			{
 				subject_entry = sk_X509_DNAME_ENTRY_value(subject,i);
-				if(issuer_entry->string_name->oid->nid == subject_entry->string_name->oid->nid)
+				if(OBJ_obj2nid(issuer_entry->string_name->oid) == OBJ_obj2nid(subject_entry->string_name->oid))
 				{
 					if(compare_dn_entries(issuer_entry,subject_entry))
 					{
@@ -1072,7 +1074,7 @@ int compare_dn(STACK_OF(X509_DNAME_ENTRY *issuer),STACK_OF(X509_DNAME_ENTRY) *su
 				if(z == i)
 				{
 					subject_entry = sk_X509_DNAME_ENTRY_value(subject,j \% num);
-					if(issuer_entry->string_name->oid->nid == subject_entry->string_name->oid->nid)
+					if(OBJ_obj2nid(issuer_entry->string_name->oid) == OBJ_obj2nid(subject_entry->string_name->oid))
 						if(compare_dn_entries(issuer_entry,subject_entry))
 						{
 							subject_indexes[i]=j \% num;	
@@ -1105,12 +1107,12 @@ void print_cert_info()
 	printf("version is \%d \n",cert->version);
 	if(cert->serial_number)
 		printf("serial number is \%s \n",cert->serial_number->data);
-	printf("signature algorithm is \%s \n",cert->signature_algorithm->oid->ln);
+	printf("signature algorithm is \%s \n",OBJ_nid2ln(OBJ_obj2nid(cert->signature_algorithm->oid)));
 	printf("Val time is \%d \%s , \%d \%s \n",cert->validity->notBefore->type,cert->validity->notBefore->data,cert->validity->notAfter->type,cert->validity->notAfter->data);
 	printf("Issuer is \%s \n",X509_NAME_oneline(cert->issuer,NULL,0));
 	printf("Subject is \%s \n",X509_NAME_oneline(cert->subject,NULL,0));
 	printf("Public key is \%s \n",cert->pkey->pubkey->bitstring_encoding->data);
-	printf("Public key params is \%s \n",cert->pkey->alg->params->ecpk->named_curve->ln);
+	printf("Public key params is \%s \n",OBJ_nid2ln(OBJ_obj2nid(cert->pkey->alg->params->ecpk->named_curve)));
 	printf("Signature is \%s \%s \n",cert->signature->dsa_sign->r->data,cert->signature->dsa_sign->s->data);
 	printf("Certificate is CA? \%d \n",bc_ext->value->basic_constraints->is_ca);
 }
@@ -1731,9 +1733,9 @@ pss_alg_id_params @after{#ifdef DEBUG
 		}
 		else
 		{
-			if(cert->signature_algorithm->params->pss.hash_func->nid != NID_sha1)
+			if(OBJ_obj2nid(cert->signature_algorithm->params->pss.hash_func) != NID_sha1)
 				check++;
-			if(cert->signature_algorithm->params->pss.mgf1_hash_func->nid != NID_sha1)
+			if(OBJ_obj2nid(cert->signature_algorithm->params->pss.mgf1_hash_func) != NID_sha1)
 				check++;
 			if(!cmp_asn1_string (default_salt,cert->signature_algorithm->params->pss.salt_length))
 				check++;
@@ -1743,22 +1745,22 @@ pss_alg_id_params @after{#ifdef DEBUG
 	}sequenceTag (constructedTag0 hash_alg 
 	{if(cert->signature_algorithm->params->pss.hash_func == NULL) 
 		cert->signature_algorithm->params->pss.hash_func = $hash_alg.alg;
-	else if(cert->signature_algorithm->params->pss.hash_func->nid != $hash_alg.alg->nid)
+	else if(OBJ_obj2nid(cert->signature_algorithm->params->pss.hash_func) != OBJ_obj2nid($hash_alg.alg))
 	{
 		printf("Error! Signature parameters doesn't match \n");
 		exit(SIGNATURE_PARAMS_MATCHING_ERROR);		
 	}
-	if(cert->signature_algorithm->params->pss.hash_func->nid != NID_sha1)	
+	if(OBJ_obj2nid(cert->signature_algorithm->params->pss.hash_func) != NID_sha1)	
 		check--;
 	})? (constructedTag1 mask_gen_alg
 	{if(cert->signature_algorithm->params->pss.mgf1_hash_func == NULL) 
 		cert->signature_algorithm->params->pss.mgf1_hash_func = $mask_gen_alg.alg;
-	else if(cert->signature_algorithm->params->pss.mgf1_hash_func->nid != $mask_gen_alg.alg->nid)
+	else if(OBJ_obj2nid(cert->signature_algorithm->params->pss.mgf1_hash_func) != OBJ_obj2nid($mask_gen_alg.alg))
 	{
 		printf("Error! Signature parameters doesn't match \n");
 		exit(SIGNATURE_PARAMS_MATCHING_ERROR);		
 	}
-	if(cert->signature_algorithm->params->pss.mgf1_hash_func->nid != NID_sha1)	
+	if(OBJ_obj2nid(cert->signature_algorithm->params->pss.mgf1_hash_func) != NID_sha1)	
 		check--;
 	})? (constructedTag2 salt=integer
 	{if(cert->signature_algorithm->params->pss.salt_length == NULL)
@@ -1880,7 +1882,7 @@ gost_94_alg_id @after{#ifdef DEBUG
 	{
 		if(cert->signature_algorithm->params->gost.public_key_param_set != NULL)
 			check++;
-		if(cert->signature_algorithm->params->gost.encryption_param_set->nid != default_encryption->nid)
+		if(OBJ_obj2nid(cert->signature_algorithm->params->gost.encryption_param_set) != OBJ_obj2nid(default_encryption))
 			check++;
 	}
 	#ifdef DEBUG 
@@ -1898,7 +1900,7 @@ gost_94_alg_id @after{#ifdef DEBUG
 		cert->signature_algorithm->params->gost.encryption_param_set = NULL;
 	}
 	else {if(cert->signature_algorithm->params->gost.public_key_param_set != NULL && cert->signature_algorithm->params->gost.digest_param_set != NULL &&
-		cert->signature_algorithm->params->gost.public_key_param_set->nid == $o1.text->obj->nid && cert->signature_algorithm->params->gost.digest_param_set->nid == $o2.text->obj->nid)
+		OBJ_obj2nid(cert->signature_algorithm->params->gost.public_key_param_set) == OBJ_obj2nid($o1.text->obj) && OBJ_obj2nid(cert->signature_algorithm->params->gost.digest_param_set) == OBJ_obj2nid($o2.text->obj))
 		{
 			printf("Error! Signature parameters doesn't match \n");
 			exit(GOST_SIGNATURE_PARAMS_MATCHING_ERROR);		
@@ -1910,12 +1912,12 @@ gost_94_alg_id @after{#ifdef DEBUG
 	if(cert->signature_algorithm->params->gost.encryption_param_set == NULL)
 		cert->signature_algorithm->params->gost.encryption_param_set = $o3.text->obj;
 	else {
-	if(cert->signature_algorithm->params->gost.encryption_param_set->nid !=  $o3.text->obj->nid)
+	if(OBJ_obj2nid(cert->signature_algorithm->params->gost.encryption_param_set) !=  OBJ_obj2nid($o3.text->obj))
 		{
 			printf("Error! Signature parameters doesn't match \n");
 			exit(GOST_SIGNATURE_PARAMS_MATCHING_ERROR);		
 		}	
-		if(cert->signature_algorithm->params->gost.encryption_param_set->nid != default_encryption->nid)
+		if(OBJ_obj2nid(cert->signature_algorithm->params->gost.encryption_param_set) != OBJ_obj2nid(default_encryption))
 			check--;}
 	})?)? {
 	if(cert->signature_algorithm == NULL)
@@ -1950,7 +1952,7 @@ gost_01_alg_id @after{#ifdef DEBUG
 	{
 		if(cert->signature_algorithm->params->gost.public_key_param_set != NULL)
 			check++;
-		if(cert->signature_algorithm->params->gost.encryption_param_set->nid != default_encryption->nid)
+		if(OBJ_obj2nid(cert->signature_algorithm->params->gost.encryption_param_set) != OBJ_obj2nid(default_encryption))
 			check++;
 	}
 	#ifdef DEBUG 
@@ -1968,7 +1970,7 @@ gost_01_alg_id @after{#ifdef DEBUG
 		cert->signature_algorithm->params->gost.encryption_param_set = NULL;
 	}
 	else {if(cert->signature_algorithm->params->gost.public_key_param_set != NULL && cert->signature_algorithm->params->gost.digest_param_set != NULL &&
-		cert->signature_algorithm->params->gost.public_key_param_set->nid == $o1.text->obj->nid && cert->signature_algorithm->params->gost.digest_param_set->nid == $o2.text->obj->nid)
+		OBJ_obj2nid(cert->signature_algorithm->params->gost.public_key_param_set) == OBJ_obj2nid($o1.text->obj) && OBJ_obj2nid(cert->signature_algorithm->params->gost.digest_param_set) == OBJ_obj2nid($o2.text->obj))
 		{
 			printf("Error! Signature parameters doesn't match \n");
 			exit(GOST_SIGNATURE_PARAMS_MATCHING_ERROR);		
@@ -1979,12 +1981,12 @@ gost_01_alg_id @after{#ifdef DEBUG
 	if(cert->signature_algorithm->params->gost.encryption_param_set == NULL)
 		cert->signature_algorithm->params->gost.encryption_param_set = $o3.text->obj;
 	else {
-	if(cert->signature_algorithm->params->gost.encryption_param_set->nid !=  $o3.text->obj->nid)
+	if(OBJ_obj2nid(cert->signature_algorithm->params->gost.encryption_param_set) !=  OBJ_obj2nid($o3.text->obj))
 		{
 			printf("Error! Signature parameters doesn't match \n");
 			exit(GOST_SIGNATURE_PARAMS_MATCHING_ERROR);		
 		}
-	if(cert->signature_algorithm->params->gost.encryption_param_set->nid != default_encryption->nid)
+	if(OBJ_obj2nid(cert->signature_algorithm->params->gost.encryption_param_set) != OBJ_obj2nid(default_encryption))
 		check--;}
 	})?)?{
 	if(cert->signature_algorithm == NULL)
@@ -2749,7 +2751,7 @@ attribute returns[SUBJECT_DIRECTORY_ATTRIBUTES *text]   @init{$text=malloc(sizeo
 	{
 	ASN1_STRING *out = malloc(sizeof(ASN1_STRING));
 	out->data = NULL;
-	ASN1_STRING_TABLE *tbl = ASN1_STRING_TABLE_get($text->oid->nid);
+	ASN1_STRING_TABLE *tbl = ASN1_STRING_TABLE_get(OBJ_obj2nid($text->oid));
 	if(ASN1_mbstring_ncopy(&out,$directoryString.text->data,$directoryString.text->length,$directoryString.text->type,tbl->mask,tbl->minsize,tbl->maxsize) == -1)
 	{
 		printf("Attribute String length constraint not satisfied \n");
@@ -2764,7 +2766,7 @@ attribute returns[SUBJECT_DIRECTORY_ATTRIBUTES *text]   @init{$text=malloc(sizeo
 	{
 	ASN1_STRING *out = malloc(sizeof(ASN1_STRING));
 	out->data = NULL;
-	ASN1_STRING_TABLE *tbl = ASN1_STRING_TABLE_get($text->oid->nid);
+	ASN1_STRING_TABLE *tbl = ASN1_STRING_TABLE_get(OBJ_obj2nid($text->oid));
 	if(ASN1_mbstring_ncopy(&out,$printString.text->data,$printString.text->length,MBSTRING_ASC,tbl->mask,tbl->minsize,tbl->maxsize) == -1)
 	{
 		printf("Attribute String length constraint not satisfied \n");
@@ -3938,7 +3940,7 @@ dn    @init{ASN1_OBJECT *obj;ASN1_STRING *str;
 		{
 			ASN1_STRING *out = malloc(sizeof(ASN1_STRING));
 			out->data = NULL;
-			ASN1_STRING_TABLE *tbl = ASN1_STRING_TABLE_get(obj->nid);
+			ASN1_STRING_TABLE *tbl = ASN1_STRING_TABLE_get(OBJ_obj2nid(obj));
 			if(ASN1_mbstring_ncopy(&out,str->data,str->length,str->type,tbl->mask,tbl->minsize,tbl->maxsize) == -1)
 			{
 				printf("DN String length constraint not satisfied \n");

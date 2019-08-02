@@ -13,8 +13,8 @@ set of complementary RFC documents:
  * RFC5480 (Ellyptic Curve Crypto), 
  * RFC3279 (Basic RSA, DSA, DH)  
 
-All the details about the design of the predicated grammar will be found in
-an under publication paper.
+All the details about the design of the predicated grammar can be found in
+this [paper](http://dx.doi.org/10.3233/JCS-171110) published in the Journal of Computer Security (volume 26, issue 6).
 
 ## Dependencies
 ##### -----BEGIN DEPENDENCIES-----

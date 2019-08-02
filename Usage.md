@@ -1,3 +1,4 @@
+
 This file shows how to generate, compile and run NAXiPP.
 
 # Generate Parser
@@ -16,17 +17,18 @@ Java archive explicitly to the CLASSPATH environment variable:
 `export CLASSPATH=.:./antlr-3.5.2-complete.jar:$CLASSPATH`
 
 Replace antlr-3.5.2-complete.jar with the actual jar of your
-ANTLR installation. Then, we can invoke ANTLR with the following
-command:
+ANTLR installation. Then, we can generate the parser by employing
+the Makefile with target gen_parser:
 
-`java org.antlr.Tool RFC5280.g`
+`make gen_parser`
 
 Remarks:
- 1. parser generation might be memory intensive. Therefore, You 
-    may need to add the option -Xmx[number]g to increase to 
-    [number] GB the amount of RAM used by the Java Virtual 
-    Machine(JVM).
- 1. It is likely that You will observe a lot of warnings stating
+ 1. Parser generation might be memory intensive. Therefore, while
+    calling ANTLR in the Makefile, 16 GB of RAM are reserved for
+    the Java Virtual Machine (JVM). You may need to adjust this 
+    amount of RAM with the option -Xmx[number]g to set to 
+    [number] GB the amount of RAM used by the JVM.
+ 1. It is likely that you will observe a lot of warnings stating
     a template error. You can ignore those warnings since they
     are due to an unfixed harmless bug in ANTLR C backend
 
@@ -38,34 +40,36 @@ compilation of the parser
 # Compile Parser
 
 ##### -----BEGIN COMPILING-----
-To compile the parser, You can simply use gcc or clang to compile
-3 source files: lexer, parser and main. Refer to the Makefile,
-in particular to x509parser target, to see an example of the
-compiler invocation. Please, be sure that all the dynamic libraries
-needed by the parser (which can be found in the README file) are 
-installed on the system where the parser is compiled.
+To compile the parser, You can simply run `make` command with default
+target. clang compiler is the default choice, but it can be changed
+by modifying the `CC` variable in the Makefile. Please, be sure that 
+all the header files and the dynamic libraries needed by the parser 
+(which can be found in the README file) can be found, setting the 
+`INCLUDE_DIR` and `LIB_DIR` variables if needed.
+
+By default, `make` generates two executables, one expecting X.509 
+certificates in DER format while the other one expects X.509
+certificates in PEM format. To generate only one of the two executables
+run, respectively, `make x509parser_der` and `make x509parser_pem`
 ##### -----END COMPILING-----
 
 # Run Parser
 
 ##### -----BEGIN USAGE-----
-Right now, there are different interfaces to X.509ParSec,
-depending on which main file You compile.
+Right now, there are two different versions of NAXiPP.
 
- 1. `RFC5280MainPem.c` : The certificate to be parsed is provided
+ 1. `x509parser_pem` : The certificate to be parsed is provided
 as the first command line argument to the executable, in PEM format 
 with no newlines (see example pem certificates). For instance,
 assuming we want to parse the example certificate 
-`KeycertSignNoBC_no_nl.pem` and the executable name is x509parser,
-the parser is invoked by:
+`KeycertSignNoBC_no_nl.pem`, the parser is invoked by:
 
 `./x509parser_pem $(cat KeycertSignNoBC_no_nl.pem)`
 
- 2. `RFC5280MainDer.c` : The path of the file storing the certificate 
+ 2. `x509parser_der` : The path of the file storing the certificate 
 in DER format is the first command line argument to the executable.
 For instance, assuming we want to parse the example certificate 
-`hugeGenNames.der` and the executable name is x509parser, the parser
-is inovked by:
+`hugeGenNames.der`, the parser is invoked by:
 
 `./x509parser_der hugeGenNames.der`
 
